@@ -56,10 +56,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "untitled:build:production"
+              "buildTarget": "potion-hut-puzzle-solver:build:production"
             },
             "development": {
-              "buildTarget": "untitled:build:development"
+              "buildTarget": "potion-hut-puzzle-solver:build:development"
             }
           },
           "defaultConfiguration": "development"
