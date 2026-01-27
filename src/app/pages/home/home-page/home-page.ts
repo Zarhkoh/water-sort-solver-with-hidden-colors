@@ -223,6 +223,7 @@ export class HomePage {
     if (this.solutions.length === 0) {
       alert('No solution found.');
     } else {
+      this.stopSearching = true;
       alert(`${this.solutions.length} solutions found!`);
     }
   }

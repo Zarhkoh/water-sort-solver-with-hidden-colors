@@ -100,8 +100,8 @@
     <h3>Resolution</h3>
 
     <div class="solve-buttons">
-    <button class="btn-search" (click)="solveAllSolutions()" [disabled]="searchingSolutions || solutions.length > 0">
-      🔍 Find all possibilities
+    <button class="btn-search" (click)="solveAllSolutions()" [disabled]="searchingSolutions">
+       <span>{{solutions.length>0 ? '♻️ Recalculate':'🔍 Find all possibilities'}} </span>
     </button>
     <button
       *ngIf="searchingSolutions"
@@ -118,7 +118,7 @@
         <div class="progress-fill" [style.width.%]="(testedPossibilities / totalPossibilities) * 100"></div>
       </div>
       <div class="progress-text">
-        Testing {{ testedPossibilities }} / {{ totalPossibilities }} ({{ solutions.length }} possibilities)
+        Testing possibility {{ testedPossibilities }} on a total of {{ totalPossibilities }} possibilities.
       </div>
     </div>
 
