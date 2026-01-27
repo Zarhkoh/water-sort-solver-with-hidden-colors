@@ -1,0 +1,211 @@
+<div class="container">
+  <h1>Potion Hut Puzzle Solver</h1>
+  <section class="panel">
+    <h3>Colors</h3>
+    <div>
+      <label>Add colors :</label>
+    </div>
+    <div>
+      <input
+        type="text"
+        [(ngModel)]="newColorHex"
+        placeholder="#FF0000"
+      >
+      <button (click)="addAvailableColor()">Add</button>
+    </div>
+
+    <div class="colors-palette">
+      <div style="margin: 5px 0">Existing colors :</div>
+      <div *ngFor="let c of availableColors; let i = index" class="color-item">
+        <button
+          class="color-btn"
+          [style.background]="c"
+          (click)="highlightedLayer ? replaceHighlightedLayer(c) : addLayerToSelectedTube(c)"
+          [title]="c"
+        >
+          {{ countColorUsage(c) }}
+        </button>
+        <button class="delete-btn" (click)="removeAvailableColor(i)">×</button>
+      </div>
+
+      <!-- Wildcard -->
+      <div class="color-item">
+        <button
+          class="color-btn wildcard-btn"
+          (click)="highlightedLayer ? replaceHighlightedLayer('?') : addWildcardToSelectedTube()"
+          title="Wildcard ?"
+        >
+          ?
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. TUBES -->
+  <section class="panel">
+    <div class="section-header">
+      <h3>Flasks (capacity: {{ tubeCapacity }})</h3>
+      <div class="config-buttons">
+        <button (click)="exportConfig()" class="btn-primary">JSON Export</button>
+        <button (click)="importConfig()" class="btn-secondary">JSON Import</button>
+      </div>
+    </div>
+    <button (click)="addTube()">+ Add flask</button>
+
+    <div class="tubes">
+      <div
+        *ngFor="let tube of puzzle.tubes; let ti = index"
+        class="tube"
+        [class.edit-selected]="selectedTubeIndex === ti"
+        (click)="onTubeSelectForEdit(ti)"
+      >
+        <div class="tube-header">
+          <div>Flask {{ ti + 1 }}</div>
+          <div class="tube-actions">
+            <button
+              class="small-btn clear-btn"
+              (click)="clearTube(ti); $event.stopPropagation()"
+              title="Flush"
+            >
+              ♻️️
+            </button>
+            <button
+              class="small-btn"
+              (click)="removeTube(ti); $event.stopPropagation()"
+              title="Delete"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+
+        <div class="tube-inner clickable-layers">
+          <div
+            *ngFor="let layer of tube.layers; let li = index"
+            class="layer clickable-layer"
+            [style.background]="layer === '?' ? '#333333' : layer"
+            [style.height]="100 / tube.capacity + '%'"
+            [class.wildcard-layer]="layer === '?'"
+            [class.highlighted]="highlightedLayer?.tubeIndex === ti && highlightedLayer?.layerIndex === li"
+            (click)="toggleLayerHighlight(ti, li); $event.stopPropagation()"
+          ></div>
+        </div>
+        <div class="tube-fullness">{{ tube.layers.length }}/{{ tube.capacity }}</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. RÉSOLUTION -->
+  <section class="panel">
+    <h3>Resolution</h3>
+
+    <div class="solve-buttons">
+    <button class="btn-search" (click)="solveAllSolutions()" [disabled]="searchingSolutions || solutions.length > 0">
+      🔍 Find all possibilities
+    </button>
+    <button
+      *ngIf="searchingSolutions"
+      (click)="stopSearch()"
+      class="btn-danger"
+    >
+      ⏹️ Stop Searching
+    </button>
+    </div>
+
+    <!-- Barre de progression -->
+    <div *ngIf="searchingSolutions" class="progress-section" #progressSection>
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="(testedPossibilities / totalPossibilities) * 100"></div>
+      </div>
+      <div class="progress-text">
+        Testing {{ testedPossibilities }} / {{ totalPossibilities }} ({{ solutions.length }} possibilities)
+      </div>
+    </div>
+
+    <!-- Solutions trouvées -->
+    <div *ngIf="solutions.length > 0" class="solutions-section">
+      <div class="solutions-stats">{{ solutions.length }} viables possibilities found !</div>
+
+      <!-- Onglets AVANT le contenu -->
+      <div class="tabs">
+        <button
+          *ngFor="let sol of solutions; let i = index"
+          class="tab-btn"
+          [class.active]="i === selectedSolutionTab"
+          (click)="selectedSolutionTab = i; currentPreviewStep = 0"
+        >
+          Sol. {{ i + 1 }} ({{ sol.moves.length }} steps)
+        </button>
+      </div>
+
+      <!-- Contenu de l'onglet actif -->
+      <div class="tab-content">
+        <h4>Solution {{ selectedSolutionTab + 1 }} - {{ solutions[selectedSolutionTab].moves.length }} steps</h4>
+
+        <!-- Configuration supposée -->
+        <h5>Assumed configuration :</h5>
+        <div class="assumed-config">
+          <div *ngFor="let tube of solutions[selectedSolutionTab].possibility.tubes; let i = index" class="config-tube">
+            <div class="tube-header-small">T{{ i + 1 }}</div>
+            <div class="config-layers">
+              <div
+                *ngFor="let layer of tube.layers"
+                class="config-layer"
+                [style.background]="layer === '?' ? '#333333' : layer"
+                [style.height]="100 / tube.capacity + '%'"
+                [class.wildcard-layer]="layer === '?'"
+              >
+                <span *ngIf="layer === '?'" class="wildcard-text">?</span>
+              </div>
+            </div>
+            <div class="tube-fullness-small">{{ tube.layers.length }}/{{ tube.capacity }}</div>
+          </div>
+        </div>
+
+        <!-- Navigation étapes -->
+        <div class="step-nav">
+          <button (click)="prevPreviewStep(selectedSolutionTab)" [disabled]="currentPreviewStep === 0">
+            ◀ Previous
+          </button>
+          <span>Step {{ currentPreviewStep + 1 }} / {{ solutions[selectedSolutionTab].moves.length + 1 }}</span>
+          <button (click)="nextPreviewStep(selectedSolutionTab)" [disabled]="currentPreviewStep === solutions[selectedSolutionTab].moves.length">
+            Next ▶
+          </button>
+        </div>
+
+        <!-- Aperçu étape -->
+        <div *ngIf="currentPreviewStep > 0" class="current-move">
+          <h5>
+            Step {{ currentPreviewStep }} :
+            <strong>
+              Flask {{ solutions[selectedSolutionTab].moves[currentPreviewStep - 1].from + 1 }}
+              → Flask {{ solutions[selectedSolutionTab].moves[currentPreviewStep - 1].to + 1 }}
+            </strong>
+          </h5>
+
+          <div class="preview-section">
+            <div class="preview-header">Result after this move :</div>
+            <div class="preview-tubes">
+              <div
+                *ngFor="let tube of solutions[selectedSolutionTab].history.states[currentPreviewStep].tubes; let i = index"
+                class="preview-tube"
+              >
+                <div class="tube-header-small">T{{ i + 1 }}</div>
+                <div class="preview-tube-inner">
+                  <div
+                    *ngFor="let layer of tube.layers"
+                    class="preview-layer"
+                    [style.background]="layer === '?' ? '#333333' : layer"
+                    [style.height]="100 / tube.capacity + '%'"
+                    [class.wildcard-layer]="layer === '?'"
+                  ></div>
+                </div>
+                <div class="tube-fullness">{{ tube.layers.length }}/{{ tube.capacity }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

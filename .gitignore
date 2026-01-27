@@ -1,0 +1,57 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# Angular
+dist/
+.angular/
+*.js.map
+*.js
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.sublime-workspace
+*.sublime-project
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# OS
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Build outputs
+/build/
+/out/
+
+# Temporary files
+*.tmp
+*.bak
+
+# IDE specific
+.vs/
+.vscode/settings.json
+
+# Angular specific
+/e2e/protractor.conf.js
+/e2e/protractor-ci.conf.js
+karma.conf.js
+/karma.conf.js
+
+# NativeScript
+/platforms/
+/hooks/
