@@ -26,7 +26,7 @@ export class HomePage {
 
   constructor(private cdr: ChangeDetectorRef) {}
   tubeCapacity = 4;
-  availableColors: ColorHex[] = ['#cfcecd', '#28cf99', '#edc740'];
+  availableColors: ColorHex[] = ['#CFCECD','#28CF99','#EDC740','#F9587D','#98C40F','#6EAAF1','#E57B41','#a432f6'];
   newColorHex = '#FFFF00';
   //Pour l'édition des layers
   highlightedLayer: { tubeIndex: number; layerIndex: number } | null = null;
