@@ -634,4 +634,17 @@
 }
 
 .btn-danger:hover {
-  background: #c82333;}
+  background: #c82333;
+}
+.solution-title{
+margin-bottom: 0;
+}
+
+.display-seed{
+  background: #d8d8d8;
+  padding:1px 3px;
+  border-radius: 2px;
+  font-family: "Goldman", sans-serif;
+  color: #676767;
+  font-size: 10px;
+}

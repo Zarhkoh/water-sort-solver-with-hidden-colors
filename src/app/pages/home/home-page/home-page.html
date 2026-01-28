@@ -140,7 +140,8 @@
 
       <!-- Contenu de l'onglet actif -->
       <div class="tab-content">
-        <h4>Solution {{ selectedSolutionTab + 1 }} - {{ solutions[selectedSolutionTab].moves.length }} steps</h4>
+        <h4 class="solution-title">Solution {{ selectedSolutionTab + 1 }} - {{ solutions[selectedSolutionTab].moves.length }} steps</h4>
+        <span class="display-seed">identifier:{{generateSolutionId(solutions[selectedSolutionTab].moves)}}</span>
 
         <!-- Configuration supposée -->
         <h5>Assumed configuration :</h5>
