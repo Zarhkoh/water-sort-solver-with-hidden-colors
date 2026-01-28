@@ -275,7 +275,9 @@ export class HomePage {
       return;
     }
     tube.layers.push(color);
-    console.log(tube.layers);
+    if(tube.layers.length ===tube.capacity && this.selectedTubeIndex < this.puzzle.tubes.length - 1 && this.puzzle.tubes[this.selectedTubeIndex+1].layers.length===0) {
+      this.selectedTubeIndex +=1;
+    }
   }
 
   addWildcardToSelectedTube() {
