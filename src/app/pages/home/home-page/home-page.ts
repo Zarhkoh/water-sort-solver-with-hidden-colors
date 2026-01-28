@@ -102,6 +102,7 @@ export class HomePage {
       capacity: this.tubeCapacity,
       layers: []
     });
+    this.selectedTubeIndex = this.puzzle.tubes.length - 1;
   }
 
   clearTube(index: number) {
